@@ -3,6 +3,7 @@ import * as cdk from 'aws-cdk-lib';
 import {Environment} from 'aws-cdk-lib';
 import {Env, ProdExportNames, UatExportNames} from "../lib/Env";
 import SaasWorkshop from "../lib/SaasWorkshop";
+import EmailReceivingStack from "../lib/EmailReceivingStack";
 
 const app = new cdk.App();
 
@@ -20,5 +21,11 @@ new SaasWorkshop(app, Env.Uat, UatExportNames, {
 new SaasWorkshop(app, Env.Prod, ProdExportNames, {
   stackName: `LazyInvoiceHostedZoneStackProd`,
   description: `This stack includes resources needed to create the hosted zone for LazyInvoice Prod`,
+  env,
+});
+
+new EmailReceivingStack(app, ProdExportNames.hostedZoneIdExportName, {
+  stackName: `LazyInvoiceEmailReceivingStack`,
+  description: `This stack includes resources needed to receive emails for LazyInvoice`,
   env,
 });
