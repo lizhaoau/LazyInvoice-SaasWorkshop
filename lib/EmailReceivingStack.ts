@@ -1,13 +1,16 @@
 import * as cdk from 'aws-cdk-lib'
-import { Duration } from 'aws-cdk-lib'
-import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
-import { Architecture, Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambda'
-import type { MxRecord } from 'aws-cdk-lib/aws-route53'
-import type { Bucket } from 'aws-cdk-lib/aws-s3'
-import { ReceiptRuleSet } from 'aws-cdk-lib/aws-ses'
-import type { Construct } from 'constructs'
+import {Duration, Fn} from 'aws-cdk-lib'
+import {Effect, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam'
+import {Architecture, Code, Function as LambdaFunction, Runtime} from 'aws-cdk-lib/aws-lambda'
+import {Bucket, BucketEncryption} from 'aws-cdk-lib/aws-s3'
+import {ReceiptRuleSet} from 'aws-cdk-lib/aws-ses'
+import type {Construct} from 'constructs'
 
-import { EmailForwardingLambdaCode } from './EmailForwardingLambdaCode'
+import {EmailForwardingLambdaCode} from './EmailForwardingLambdaCode'
+import {DomainName, Env} from "./Env";
+import {Lambda, LambdaInvocationType, S3} from "aws-cdk-lib/aws-ses-actions";
+import {HostedZone, MxRecord} from "aws-cdk-lib/aws-route53";
+import SaasWorkshop from "./SaasWorkshop";
 
 class EmailReceivingStack extends cdk.Stack {
   constructor(
@@ -24,7 +27,13 @@ class EmailReceivingStack extends cdk.Stack {
   }
 
   private createS3Bucket(): Bucket {
-    // TODO: Add a bucket
+    return new Bucket(this, 'EmailBucket', {
+      bucketName: 'lazy-invoice-email-receiving-bucket',
+      encryption: BucketEncryption.S3_MANAGED,
+      versioned: false,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
+    })
   }
 
   private createLambda(bucket: Bucket): LambdaFunction {
@@ -32,9 +41,43 @@ class EmailReceivingStack extends cdk.Stack {
       roleName: 'email-forwarding-lambda-role',
       assumedBy: new ServicePrincipal('lambda.amazonaws.com')
     })
-    // TODO: Add policies tp the role
+
+    // Add S3 policies to the role
+    role.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        's3:GetObject',
+        's3:PutObject',
+      ],
+      resources: [
+        `${bucket.bucketArn}/*`
+      ]
+    }))
+
+    //Add CloudWatch Logs policies to the role
+    role.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions:[
+        'logs:CreateLogGroup',
+        'logs:CreateLogStream',
+        'logs:PutLogEvents'
+      ],
+      resources: ['arn:aws:logs:*:*:*']
+    }))
+
+    //add SES policies to the role
+    role.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions:[
+        'ses:SendRawEmail',
+        'ses:SendEmail',
+      ],
+      resources:['arn:aws:ses:us-east-1:484011448296:identity/*']
+    }))
+
+
     return new LambdaFunction(this, 'EmailForwarding-Lambda', {
-      functionName: '=mailForwardingFunction',
+      functionName: 'mailForwardingFunction',
       runtime: Runtime.NODEJS_16_X,
       code: Code.fromInline(EmailForwardingLambdaCode),
       handler: 'index.handler',
@@ -49,13 +92,35 @@ class EmailReceivingStack extends cdk.Stack {
     const ruleSet = new ReceiptRuleSet(this, 'EmailReceiving-RuleSet', {
       receiptRuleSetName: 'rule-set'
     })
-    // TODO: Add a rule to the rule set
+    ruleSet.addRule('Lazy-invoice-EmailReceiving-ruleSet', {
+      receiptRuleName: 'lazy-invoice-email-receiving-rule-set',
+      enabled: true,
+      scanEnabled: true,
+      recipients: [`.${DomainName.Prod}`, DomainName.Prod],
+      actions:[
+        new S3({bucket}),
+        new Lambda({
+          function: lambda, invocationType: LambdaInvocationType.EVENT
+        })
+      ]
+    })
+
     return ruleSet
   }
 
   private addMxRecord(): MxRecord {
-    // TODO: Add an MX record
-  }
+    const zone = SaasWorkshop.getHostedZone(this, Env.Prod,
+      { hostedZoneIdExportName: this.hostedZoneIdExportName })
+    return new MxRecord(this, 'LazyInvoice-EmailReceiving-MxRecord', {
+      zone,
+      recordName: DomainName.Prod,
+      values: [{
+        priority: 10,
+        hostName: 'inbound-smtp.us-east-1.amazonaws.com'
+      }],
+      ttl: Duration.days(1)
+    })
+    }
 }
 
 export default EmailReceivingStack

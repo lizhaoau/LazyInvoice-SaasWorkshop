@@ -24,9 +24,9 @@ class SaasWorkshop extends cdk.Stack {
     // });
   }
 
-  static getHostedZone(stack: cdk.Stack, env: Env, outputs:{ hostedZoneIdExportName: string}): IPublicHostedZone {
+  static getHostedZone(stack: cdk.Stack, env: Env, outputs: { hostedZoneIdExportName: string }): IPublicHostedZone {
     const hostedZoneId = cdk.Fn.importValue(outputs.hostedZoneIdExportName)
-    return PublicHostedZone.fromHostedZoneAttributes(stack, `JDKStorage-HostedZone-Output-${env}`, {
+    return PublicHostedZone.fromPublicHostedZoneAttributes(stack, `XLearning-HostedZone-Output-${env}`, {
       hostedZoneId,
       zoneName: DomainName[env]
     })

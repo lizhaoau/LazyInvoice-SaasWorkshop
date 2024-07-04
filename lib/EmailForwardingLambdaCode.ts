@@ -35,17 +35,17 @@ var AWS = require('aws-sdk');
 //
 //   To match all email addresses matching no other mapping, use "@" as a key.
 var defaultConfig = {
-  fromEmail: "noreply@xlearning.site",
+  fromEmail: "noreply@lazyinvoice.xyz",
   subjectPrefix: "",
-  emailBucket: "mail.xlearning.site",
+  emailBucket: "lazy-invoice-email-receiving-bucket",
   emailKeyPrefix: "",
   allowPlusSign: true,
   forwardMapping: {
-    "support@domain.com": [
-      "xxx@gmail.com"
+    "support@lazyinvoice.xyz": [
+      "zhaoli.xjtu@gmail.com", "lzhao@bglcorp.com.au"
     ],
-    "@xlearning.site": [
-      "xxxx@gmail.com"
+    "@lazyinvoice.xyz": [
+      "zhaoli.xjtu@gmail.com"
     ]
   }
 };
