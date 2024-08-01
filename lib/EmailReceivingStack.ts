@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib'
-import {Duration, Fn} from 'aws-cdk-lib'
+import {Duration, Fn, RemovalPolicy} from 'aws-cdk-lib'
 import {Effect, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam'
 import {Architecture, Code, Function as LambdaFunction, Runtime} from 'aws-cdk-lib/aws-lambda'
 import {Bucket, BucketEncryption} from 'aws-cdk-lib/aws-s3'
@@ -29,10 +29,9 @@ class EmailReceivingStack extends cdk.Stack {
   private createS3Bucket(): Bucket {
     return new Bucket(this, 'EmailBucket', {
       bucketName: 'lazy-invoice-email-receiving-bucket',
-      encryption: BucketEncryption.S3_MANAGED,
+      publicReadAccess: false,
       versioned: false,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true
+      removalPolicy: RemovalPolicy.DESTROY
     })
   }
 
@@ -72,7 +71,7 @@ class EmailReceivingStack extends cdk.Stack {
         'ses:SendRawEmail',
         'ses:SendEmail',
       ],
-      resources:['arn:aws:ses:us-east-1:484011448296:identity/*']
+      resources:['arn:aws:ses:ap-southeast-2:014498632285:identity/*']
     }))
 
 
@@ -92,8 +91,9 @@ class EmailReceivingStack extends cdk.Stack {
     const ruleSet = new ReceiptRuleSet(this, 'EmailReceiving-RuleSet', {
       receiptRuleSetName: 'rule-set'
     })
-    ruleSet.addRule('Lazy-invoice-EmailReceiving-ruleSet', {
-      receiptRuleName: 'lazy-invoice-email-receiving-rule-set',
+
+    ruleSet.addRule('Lazy-invoice-EmailReceiving-ruleSet1', {
+      receiptRuleName: 'lazy-invoice-email-receiving-rule-set1',
       enabled: true,
       scanEnabled: true,
       recipients: [`.${DomainName.Prod}`, DomainName.Prod],
@@ -116,7 +116,7 @@ class EmailReceivingStack extends cdk.Stack {
       recordName: DomainName.Prod,
       values: [{
         priority: 10,
-        hostName: 'inbound-smtp.us-east-1.amazonaws.com'
+        hostName: 'inbound-smtp.ap-southeast-2.amazonaws.com'
       }],
       ttl: Duration.days(1)
     })
