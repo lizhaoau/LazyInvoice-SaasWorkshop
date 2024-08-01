@@ -42,7 +42,7 @@ var defaultConfig = {
   allowPlusSign: true,
   forwardMapping: {
     "support@lazyinvoice.xyz": [
-      "zhaoli.xjtu@gmail.com", "lzhao@bglcorp.com.au"
+     "lzhao@bglcorp.com.au"
     ],
     "@lazyinvoice.xyz": [
       "zhaoli.xjtu@gmail.com"
@@ -330,7 +330,7 @@ exports.handler = function(event, context, callback, overrides) {
     context: context,
     config: overrides && overrides.config ? overrides.config : defaultConfig,
     log: overrides && overrides.log ? overrides.log : console.log,
-    ses: overrides && overrides.ses ? overrides.ses : new AWS.SES({ region: "us-east-1" }),
+    ses: overrides && overrides.ses ? overrides.ses : new AWS.SES({ region: "ap-southeast-2" }),
     s3: overrides && overrides.s3 ?
       overrides.s3 : new AWS.S3({signatureVersion: 'v4'})
   };

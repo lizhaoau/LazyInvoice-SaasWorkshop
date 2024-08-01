@@ -8,8 +8,8 @@ import EmailReceivingStack from "../lib/EmailReceivingStack";
 const app = new cdk.App();
 
 const env: Environment = {
-  account: "484011448296",
-  region: "us-east-1"
+  account: "014498632285",
+  region: "ap-southeast-2"
 }
 
 new SaasWorkshop(app, Env.Uat, UatExportNames, {
