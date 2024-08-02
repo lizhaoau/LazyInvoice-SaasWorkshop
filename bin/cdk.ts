@@ -4,6 +4,8 @@ import {Environment} from 'aws-cdk-lib';
 import {Env, ProdExportNames, UatExportNames} from "../lib/Env";
 import SaasWorkshop from "../lib/SaasWorkshop";
 import EmailReceivingStack from "../lib/EmailReceivingStack";
+import UserPoolStack from "../lib/UserPoolStack";
+import ACMStack from "../lib/ACMStack";
 
 const app = new cdk.App();
 
@@ -29,3 +31,27 @@ new EmailReceivingStack(app, ProdExportNames.hostedZoneIdExportName, {
   description: `This stack includes resources needed to receive emails for LazyInvoice`,
   env,
 });
+
+new UserPoolStack(app, Env.Uat, UatExportNames, {
+  stackName: 'LazyInvoiceUserPoolStackUat',
+  description: 'This stack includes resources needed to deploy the User Pool into this environment',
+  env
+})
+
+new UserPoolStack(app, Env.Prod, ProdExportNames, {
+  stackName: 'LazyInvoiceUserPoolStackProd',
+  description: 'This stack includes resources needed to deploy the User Pool into this environment',
+  env
+})
+
+new ACMStack(app, Env.Uat, UatExportNames, {
+  stackName: 'LazyInvoiceACMStackUat',
+  description: 'This stack includes resources needed to create the certificates into this environment',
+  env
+})
+
+new ACMStack(app, Env.Prod, ProdExportNames, {
+  stackName: 'LazyInvoiceACMStackProd',
+  description: 'This stack includes resources needed to create the certificates into this environment',
+  env
+})
