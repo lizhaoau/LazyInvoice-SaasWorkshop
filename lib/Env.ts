@@ -13,8 +13,10 @@ export const DomainName:{[key in Env]: string} = {
 enum ExportName{
   hostedZoneIdExportName = "HostedZoneId",
   userPoolArnExportName = "UserPoolArn",
+  s3BucketArnExportName = "UIBucketArn",
   acmUsersCertificateArnExportName = "AcmUsersCertificateArn",
-  acmRootCertificateArnExportName = "AcmRootCertificateArn"
+  acmRootCertificateArnExportName = "AcmRootCertificateArn",
+  s3BucketNameExportName = "UatS3BucketName",
 }
 
 const getExportNames =(env: Env) => mapValues(ExportName, (value) => `LazyInovice${env}${value}`)

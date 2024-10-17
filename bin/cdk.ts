@@ -6,12 +6,13 @@ import SaasWorkshop from "../lib/SaasWorkshop";
 import EmailReceivingStack from "../lib/EmailReceivingStack";
 import UserPoolStack from "../lib/UserPoolStack";
 import ACMStack from "../lib/ACMStack";
+import UIStack from "../lib/UIStack";
 
 const app = new cdk.App();
 
 const env: Environment = {
   account: "014498632285",
-  region: "ap-southeast-2"
+  region: "us-east-1"
 }
 
 new SaasWorkshop(app, Env.Uat, UatExportNames, {
@@ -47,11 +48,25 @@ new UserPoolStack(app, Env.Prod, ProdExportNames, {
 new ACMStack(app, Env.Uat, UatExportNames, {
   stackName: 'LazyInvoiceACMStackUat',
   description: 'This stack includes resources needed to create the certificates into this environment',
+  crossRegionReferences:true,
   env
+  // env: { account: env.account, region : 'us-east-1' }
 })
 
 new ACMStack(app, Env.Prod, ProdExportNames, {
   stackName: 'LazyInvoiceACMStackProd',
   description: 'This stack includes resources needed to create the certificates into this environment',
+  env
+})
+
+new UIStack(app, Env.Uat,UatExportNames, {
+  stackName: 'LazyInvoiceUIStackUat',
+  description: 'This stack includes resources needed to deploy the UI into this environment',
+  env
+})
+
+new UIStack(app, Env.Prod, ProdExportNames, {
+  stackName: 'LazyInvoiceUIStackProd',
+  description: 'This stack includes resources needed to deploy the UI into this environment',
   env
 })

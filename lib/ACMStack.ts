@@ -52,7 +52,7 @@ class ACMStack extends cdk.Stack {
     return new Certificate(this, `LazyInvoice-Root-Certificate-${this.env}`, {
       certificateName: `LazyInvoice-root-certificate-${lowerCase(this.env)}`,
       domainName: DomainName[this.env],
-      subjectAlternativeNames: [`www.${DomainName[this.env]}`],
+      // subjectAlternativeNames: DomainName[this.env],
       validation
     })
   }
@@ -60,9 +60,14 @@ class ACMStack extends cdk.Stack {
   private createUsersCertificate(validation: CertificateValidation): Certificate {
     return new Certificate(this, `LazyInvoice-Users-Certificate-${this.env}`, {
       certificateName: `LazyInvoice-users-certificate-${lowerCase(this.env)}`,
-      domainName: `users.${DomainName[this.env]}`,
+      domainName: DomainName[this.env],
       validation
     })
+  }
+
+  static getRootCertificate(stack: cdk.Stack, env: Env, outputs: { acmRootCertificateArnExportName: string }): ICertificate {
+    const arn = cdk.Fn.importValue(outputs.acmRootCertificateArnExportName)
+    return Certificate.fromCertificateArn(stack, `LazyInvoice-Root-Certificate-Output-${env}`, arn)
   }
 }
 
