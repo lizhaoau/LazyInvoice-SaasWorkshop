@@ -110,7 +110,7 @@ class UIStack extends cdk.Stack {
           responsePagePath: '/index.html'
         }],
         certificate: Certificate.fromCertificateArn(this, `LazyInvoice-UI-Certificate-${this.env}`,
-          "arn:aws:acm:us-east-1:014498632285:certificate/3544f2e1-f518-45ac-b6df-d2f46e06259a"),
+          "arn:aws:acm:us-east-1:014498632285:certificate/05e8d577-fc8a-4b81-9693-3dd2534e2100"),
         enableLogging: false,
         enableIpv6: false,
         priceClass: PriceClass.PRICE_CLASS_ALL
