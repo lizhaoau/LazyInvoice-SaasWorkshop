@@ -12,7 +12,7 @@ const app = new cdk.App();
 
 const env: Environment = {
   account: "014498632285",
-  region: "us-east-1"
+  region: "ap-southeast-2"
 }
 
 new SaasWorkshop(app, Env.Uat, UatExportNames, {
@@ -50,7 +50,6 @@ new ACMStack(app, Env.Uat, UatExportNames, {
   description: 'This stack includes resources needed to create the certificates into this environment',
   crossRegionReferences:true,
   env
-  // env: { account: env.account, region : 'us-east-1' }
 })
 
 new ACMStack(app, Env.Prod, ProdExportNames, {
