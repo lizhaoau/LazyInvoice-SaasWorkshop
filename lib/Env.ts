@@ -14,9 +14,11 @@ enum ExportName{
   hostedZoneIdExportName = "HostedZoneId",
   userPoolArnExportName = "UserPoolArn",
   s3BucketArnExportName = "UIBucketArn",
+  distributionIdExportName = "UIDistributionId",
   acmUsersCertificateArnExportName = "AcmUsersCertificateArn",
   acmRootCertificateArnExportName = "AcmRootCertificateArn",
-  s3BucketNameExportName = "UatS3BucketName",
+  acmWebClientCertificateArnExportName = "AcmWebClientCertificateArn",
+  // s3BucketNameExportName = "UatS3BucketName",
 }
 
 const getExportNames =(env: Env) => mapValues(ExportName, (value) => `LazyInovice${env}${value}`)

@@ -10,7 +10,7 @@ import {EmailForwardingLambdaCode} from './EmailForwardingLambdaCode'
 import {DomainName, Env} from "./Env";
 import {Lambda, LambdaInvocationType, S3} from "aws-cdk-lib/aws-ses-actions";
 import {HostedZone, MxRecord} from "aws-cdk-lib/aws-route53";
-import SaasWorkshop from "./SaasWorkshop";
+import HostedZoneStack from "./HostedZoneStack";
 
 class EmailReceivingStack extends cdk.Stack {
   constructor(
@@ -109,7 +109,7 @@ class EmailReceivingStack extends cdk.Stack {
   }
 
   private addMxRecord(): MxRecord {
-    const zone = SaasWorkshop.getHostedZone(this, Env.Prod,
+    const zone = HostedZoneStack.getHostedZone(this, Env.Prod,
       { hostedZoneIdExportName: this.hostedZoneIdExportName })
     return new MxRecord(this, 'LazyInvoice-EmailReceiving-MxRecord', {
       zone,

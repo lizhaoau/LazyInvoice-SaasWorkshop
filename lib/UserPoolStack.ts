@@ -50,7 +50,7 @@ class UserPoolStack extends cdk.Stack {
   }
 
   private createUserPool(): UserPool {
-    const userPool = new UserPool(this, `XLearning-UserPool-${this.env}`, {
+    const userPool = new UserPool(this, `LazyInvoice-UserPool-${this.env}`, {
       userPoolName:`LazyInvoice-UserPool-${this.env}`,
       standardAttributes: {
         fullname: {
@@ -95,7 +95,7 @@ class UserPoolStack extends cdk.Stack {
       email:UserPoolEmail.withCognito('admin@lazyinvoice.xyz'),
       removalPolicy:RemovalPolicy.DESTROY,
     })
-    new cdk.CfnOutput(this, `XLearning-UserPool-Output-${this.env}`, {
+    new cdk.CfnOutput(this, `LazyInvoice-UserPool-Output-${this.env}`, {
       exportName: this.outputs.userPoolArnExportName,
       value: userPool.userPoolArn
     })

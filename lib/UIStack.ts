@@ -1,18 +1,18 @@
 import * as cdk from "aws-cdk-lib";
 import {Duration, RemovalPolicy} from "aws-cdk-lib";
 import type {Construct} from "constructs";
-import {DomainName, Env} from "./Env";
-import {Bucket} from "aws-cdk-lib/aws-s3";
+import {DomainName, Env, Outputs} from "./Env";
+import {Bucket, IBucket} from "aws-cdk-lib/aws-s3";
 import {
   AllowedMethods, CacheHeaderBehavior, CachePolicy,
   Distribution,
   HeadersFrameOption,
-  HeadersReferrerPolicy, OriginRequestPolicy, PriceClass,
+  HeadersReferrerPolicy, IDistribution, OriginRequestPolicy, PriceClass,
   ResponseHeadersPolicy, ViewerProtocolPolicy
 } from "aws-cdk-lib/aws-cloudfront";
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import {Certificate} from "aws-cdk-lib/aws-certificatemanager";
-import SaasWorkshop from "./SaasWorkshop";
+import HostedZoneStack from "./HostedZoneStack";
 import {ARecord, RecordTarget} from "aws-cdk-lib/aws-route53";
 import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
 
@@ -20,10 +20,7 @@ class UIStack extends cdk.Stack {
   constructor(
     readonly scope: Construct,
     readonly env: Env,
-    readonly outputs: {
-      hostedZoneIdExportName: string
-      s3BucketNameExportName: string
-    },
+    readonly outputs: Outputs,
     readonly props: cdk.StackProps
   ) {
     super(scope, props.stackName, props)
@@ -51,8 +48,8 @@ class UIStack extends cdk.Stack {
         removalPolicy: RemovalPolicy.DESTROY
       })
       new cdk.CfnOutput(this, `LazyInvoice-UI-Bucket-Output-${this.env}`, {
-        exportName: this.outputs.s3BucketNameExportName,
-        value: bucket.bucketName
+        exportName: this.outputs.s3BucketArnExportName,
+        value: bucket.bucketArn
       })
 
       return bucket;
@@ -110,14 +107,15 @@ class UIStack extends cdk.Stack {
           responsePagePath: '/index.html'
         }],
         certificate: Certificate.fromCertificateArn(this, `LazyInvoice-UI-Certificate-${this.env}`,
-          "arn:aws:acm:us-east-1:014498632285:certificate/05e8d577-fc8a-4b81-9693-3dd2534e2100"),
+          "arn:aws:acm:us-east-1:014498632285:certificate/3ab1be50-e470-4dd5-b7ab-a09fcaae63b6"),
         enableLogging: false,
         enableIpv6: false,
         priceClass: PriceClass.PRICE_CLASS_ALL
       })
 
       new cdk.CfnOutput(this, `LazyInvoice-UI-Distribution-Output-${this.env}`, {
-        exportName: `LazyInvoice-UI-Distribution-Output-${this.env}`,
+        // exportName: `LazyInvoice-UI-Distribution-Output-${this.env}`,
+        exportName: this.outputs.distributionIdExportName,
         value: distribution.distributionDomainName
       })
 
@@ -125,7 +123,7 @@ class UIStack extends cdk.Stack {
     }
 
     private createAliasRecord(distribution: Distribution): void {
-      const zone = SaasWorkshop.getHostedZone(this, this.env, this.outputs)
+      const zone = HostedZoneStack.getHostedZone(this, this.env, this.outputs)
       const target = RecordTarget.fromAlias(new CloudFrontTarget(distribution))
       new ARecord(this, `LazyInvoice-UI-CloudFront-Record-${this.env}`, {
         zone,
@@ -133,6 +131,23 @@ class UIStack extends cdk.Stack {
         recordName: DomainName[this.env]
       })
     }
+
+    static getS3BucketName(stack:cdk.Stack, env:Env,outputs:{s3BucketArnExportName: string}): IBucket {
+      console.log("s3bucketArn:::::",outputs.s3BucketArnExportName)
+      const bucketArn = cdk.Fn.importValue(outputs.s3BucketArnExportName)
+      return Bucket.fromBucketArn(stack, `LazyInvoice-UI-Bucket-Output-${env}`, bucketArn)
+    }
+
+  static getDistribution(
+    stack: cdk.Stack,
+    env: Env,
+    outputs: { distributionIdExportName: string }
+  ): IDistribution {
+    const domainName = DomainName[env]
+    console.log("distributionname::::",outputs.distributionIdExportName)
+    const distributionId = cdk.Fn.importValue(outputs.distributionIdExportName)
+    return Distribution.fromDistributionAttributes(stack, `LazyInvoice-UI-Distribution-${env}`, { domainName, distributionId })
+  }
   }
 
 export default UIStack

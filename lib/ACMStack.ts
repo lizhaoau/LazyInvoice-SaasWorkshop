@@ -6,7 +6,7 @@ import { lowerCase } from 'lodash'
 
 import type { Env } from './Env'
 import { DomainName } from './Env'
-import SaasWorkshop from "./SaasWorkshop";
+import HostedZoneStack from "./HostedZoneStack";
 
 class ACMStack extends cdk.Stack {
   constructor(
@@ -44,7 +44,7 @@ class ACMStack extends cdk.Stack {
   }
 
   private createValidation(): CertificateValidation {
-    const hostedZone = SaasWorkshop.getHostedZone(this, this.env, this.outputs)
+    const hostedZone = HostedZoneStack.getHostedZone(this, this.env, this.outputs)
     return CertificateValidation.fromDns(hostedZone)
   }
 
