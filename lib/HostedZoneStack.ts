@@ -5,7 +5,7 @@ import {HostedZone, IPublicHostedZone, PublicHostedZone} from "aws-cdk-lib/aws-r
 import {CfnOutput} from "aws-cdk-lib";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
-class SaasWorkshop extends cdk.Stack {
+class HostedZoneStack extends cdk.Stack {
   constructor(
     readonly scope: Construct,
     readonly env: Env,
@@ -26,7 +26,8 @@ class SaasWorkshop extends cdk.Stack {
 
   static getHostedZone(stack: cdk.Stack, env: Env, outputs: { hostedZoneIdExportName: string }): IPublicHostedZone {
     const hostedZoneId = cdk.Fn.importValue(outputs.hostedZoneIdExportName)
-    return PublicHostedZone.fromPublicHostedZoneAttributes(stack, `XLearning-HostedZone-Output-${env}`, {
+    // const hostedZoneId = "Z05409461EMIIDH6ZJELZ"
+    return PublicHostedZone.fromPublicHostedZoneAttributes(stack, `LazyInvoice-HostedZone-Output-${env}`, {
       hostedZoneId,
       zoneName: DomainName[env]
     })
@@ -46,5 +47,5 @@ class SaasWorkshop extends cdk.Stack {
   }
 }
 
-export default SaasWorkshop;
+export default HostedZoneStack;
 
