@@ -1,15 +1,15 @@
 import * as cdk from 'aws-cdk-lib'
-import {Duration, Fn, RemovalPolicy} from 'aws-cdk-lib'
+import {Duration, RemovalPolicy} from 'aws-cdk-lib'
 import {Effect, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam'
 import {Architecture, Code, Function as LambdaFunction, Runtime} from 'aws-cdk-lib/aws-lambda'
-import {Bucket, BucketEncryption} from 'aws-cdk-lib/aws-s3'
+import {Bucket} from 'aws-cdk-lib/aws-s3'
 import {ReceiptRuleSet} from 'aws-cdk-lib/aws-ses'
 import type {Construct} from 'constructs'
 
 import {EmailForwardingLambdaCode} from './EmailForwardingLambdaCode'
 import {DomainName, Env} from "./Env";
 import {Lambda, LambdaInvocationType, S3} from "aws-cdk-lib/aws-ses-actions";
-import {HostedZone, MxRecord} from "aws-cdk-lib/aws-route53";
+import {MxRecord} from "aws-cdk-lib/aws-route53";
 import HostedZoneStack from "./HostedZoneStack";
 
 class EmailReceivingStack extends cdk.Stack {

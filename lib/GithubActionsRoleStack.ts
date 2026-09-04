@@ -1,10 +1,9 @@
 import * as cdk from "aws-cdk-lib";
 import type {Construct} from "constructs";
-import {DomainName, Env, Outputs} from "./Env";
+import {Env, Outputs} from "./Env";
 
 import {FederatedPrincipal, OpenIdConnectProvider, Role} from "aws-cdk-lib/aws-iam";
 import UIStack from "./UIStack";
-import {Distribution} from "aws-cdk-lib/aws-cloudfront";
 
 
 class GithubActionsRoleStack extends cdk.Stack {
