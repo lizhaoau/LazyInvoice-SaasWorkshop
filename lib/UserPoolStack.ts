@@ -1,16 +1,9 @@
 import * as cdk from 'aws-cdk-lib'
-import { Duration, RemovalPolicy } from 'aws-cdk-lib'
-import {
-  AccountRecovery,
-  Mfa,
-  UserPool,
-  UserPoolEmail,
-  VerificationEmailStyle
-} from 'aws-cdk-lib/aws-cognito'
-import type { Construct } from 'constructs'
+import {Duration, RemovalPolicy} from 'aws-cdk-lib'
+import {AccountRecovery, Mfa, UserPool, UserPoolEmail} from 'aws-cdk-lib/aws-cognito'
+import type {Construct} from 'constructs'
 
-import type { Env } from './Env'
-import { DomainName } from './Env'
+import type {Env} from './Env'
 
 class UserPoolStack extends cdk.Stack {
   constructor(
